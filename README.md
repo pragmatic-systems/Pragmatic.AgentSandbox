@@ -94,7 +94,7 @@ Host Machine
 | Non-root user | ✅ | ✅ | Runs as `appuser` |
 | No privileged mode | ✅ | ✅ | Default |
 | No port exposure | ✅ | ✅ | No `ports:` block |
-| Resource limits | ✅ | ✅ | 4GB/2 CPUs (bash), 8GB/4 CPUs (pwsh) |
+| Resource limits | ✅ | ✅ | 8GB/4 CPUs |
 | `--cap-drop=ALL` | ✅ | ❌ | Requires full capabilities for Docker |
 | `no-new-privileges` | ✅ | ❌ | Requires privilege escalation for Docker |
 | Host Docker socket | ❌ | ✅ | Full access to host Docker daemon |
@@ -115,7 +115,7 @@ Only use `--docker` when you need Docker support and accept that the agent has f
 ## Configuration
 
 - **LM Studio API URL** is set via the `LMSTUDIO_API_URL` environment variable
-- **Custom models/providers** are configured in `models.json`
+- **Custom models/providers** are configured in `models.json` (baked into the image and synced into the `pi_agent` volume on every run when it has changed)
 - **Pi cache** is persisted in a Docker volume (`pi_cache`)
 - **Pi agent data** (sessions, settings, auth) is persisted in a Docker volume (`pi_agent`) so sessions survive restarts
 - **npm cache** is persisted in a Docker volume (`npm_cache`)
@@ -136,16 +136,12 @@ Pass via `-e` in the host scripts or override directly in `docker run`.
 
 ### Updating `models.json`
 
-`models.json` is bind-mounted directly from the repo root, so changes take effect on the **next run**:
+`models.json` is baked into the image at build time, then synced into the `pi_agent` volume by the entrypoint if it differs from the live copy. edit `models.json` in the repo and simply re-run the host script: it rebuilds the image and seeds the new config automatically.
+
+> **Note:** `models.json` is repo-owned, so edits made to it *inside the container* are overwritten on the next run. Customize it via the repo file instead. Other agent data (sessions, auth, `settings.json`) is preserved and never overwritten.
 
 ```bash
-pi-agent-sandbox-host
-```
-
-If you need to rebuild the image (e.g., after changing the Dockerfile):
-
-```bash
-docker build -t pi-agent-sandbox-host .
+# After editing models.json in the repo:
 pi-agent-sandbox-host
 ```
 

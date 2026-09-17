@@ -36,7 +36,7 @@ fi
 export MSYS_NO_PATHCONV=1
 
 # Build image (no-op if already built)
-docker build -q -f "$REPO_ROOT/$DOCKERFILE" -t "$IMAGE_NAME" "$REPO_ROOT" 2>/dev/null
+docker build -f "$REPO_ROOT/$DOCKERFILE" -t "$IMAGE_NAME" "$REPO_ROOT"
 
 # Run Pi
 LAUNCH_DIR="$(basename "$(pwd)")"

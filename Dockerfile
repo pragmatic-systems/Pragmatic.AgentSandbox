@@ -32,6 +32,7 @@ RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /home/appuse
 
 # --- Pi config (baked in to /opt, seeded at runtime by entrypoint) ---
 # Stored outside .pi/agent so the pi_agent volume mount doesn't shadow them
+COPY AGENTS.md /opt/pi-agent/AGENTS.md
 COPY models.json /opt/pi-agent/models.json
 COPY settings.json /opt/pi-agent/settings.json
 COPY docker-mode-indicator.ts /opt/pi-agent/docker-mode-indicator.ts

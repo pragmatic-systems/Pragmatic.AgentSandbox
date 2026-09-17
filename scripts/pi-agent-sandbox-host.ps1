@@ -15,19 +15,19 @@ if ($args -contains "--docker") {
     $EnableDocker = $true
 }
 
-# Select Dockerfile and image name
+# Select mode and image name (single Dockerfile, INSTALL_DOCKER build arg)
 if ($EnableDocker) {
-    $Dockerfile = "Dockerfile"
     $ImageName = "pi-agent-sandbox-host-dind"
+    $InstallDocker = "true"
     Write-Host "[pi-agent] Docker-in-Docker enabled (host socket)"
 } else {
-    $Dockerfile = "Dockerfile.locked"
     $ImageName = "pi-agent-sandbox-host"
+    $InstallDocker = "false"
     Write-Host "[pi-agent] Locked-down mode (no Docker)"
 }
 
 # Build image (no-op if already built)
-docker build -f "$RepoRoot/$Dockerfile" -t $ImageName "$RepoRoot"
+docker build -f "$RepoRoot/Dockerfile" --build-arg "INSTALL_DOCKER=$InstallDocker" -t $ImageName "$RepoRoot"
 
 # Run Pi
 $LaunchDir = Split-Path $PWD -Leaf
@@ -45,7 +45,6 @@ $DockerArgs = @(
     "-v", "nuget_cache://home/appuser/.nuget:rw",
     "-e", "HOME=/home/appuser",
     "-e", "NODE_ENV=development",
-    "-e", "LMSTUDIO_API_URL=http://host.docker.internal:1234/v1",
     "--memory=8g",
     "--cpus=4.0",
     "-it"

@@ -3,5 +3,6 @@
   "theme": "dark",
   "extensions": [
     "~/.pi/agent/docker-mode-indicator.ts"
-  ]
+  ],
+  "defaultThinkingLevel": "off"
 }

@@ -35,6 +35,7 @@ RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /home/appuse
 COPY AGENTS.md /opt/pi-agent/AGENTS.md
 COPY models.json /opt/pi-agent/models.json
 COPY settings.json /opt/pi-agent/settings.json
+COPY APPEND_SYSTEM.md /opt/pi-agent/APPEND_SYSTEM.md
 COPY docker-mode-indicator.ts /opt/pi-agent/docker-mode-indicator.ts
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

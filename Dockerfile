@@ -45,4 +45,4 @@ WORKDIR /home/appuser/mount
 ENV HOME=/home/appuser
 ENV NODE_ENV=development
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

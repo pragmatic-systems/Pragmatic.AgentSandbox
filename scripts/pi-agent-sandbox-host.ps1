@@ -33,14 +33,16 @@ docker build -f "$RepoRoot/$Dockerfile" -t $ImageName "$RepoRoot"
 $LaunchDir = Split-Path $PWD -Leaf
 
 # Build common arguments
+# // prefix on container paths disables Docker Desktop's Windows path conversion
+# (needed after Windows updates that changed WSL2 path handling)
 $DockerArgs = @(
     "--rm",
-    "-w", "/home/appuser/mount/${LaunchDir}",
-    "-v", "${PWD}:/home/appuser/mount/${LaunchDir}:rw",
-    "-v", "pi_cache:/home/appuser/.pi/cache:rw",
-    "-v", "pi_agent:/home/appuser/.pi/agent:rw",
-    "-v", "npm_cache:/home/appuser/.npm:rw",
-    "-v", "nuget_cache:/home/appuser/.nuget:rw",
+    "-w", "//home/appuser/mount/${LaunchDir}",
+    "-v", "${PWD}://home/appuser/mount/${LaunchDir}:rw",
+    "-v", "pi_cache://home/appuser/.pi/cache:rw",
+    "-v", "pi_agent://home/appuser/.pi/agent:rw",
+    "-v", "npm_cache://home/appuser/.npm:rw",
+    "-v", "nuget_cache://home/appuser/.nuget:rw",
     "-e", "HOME=/home/appuser",
     "-e", "NODE_ENV=development",
     "-e", "LMSTUDIO_API_URL=http://host.docker.internal:1234/v1",
@@ -56,7 +58,7 @@ if (-not $EnableDocker) {
 } else {
     # Mount Docker socket for DinD support
     $DockerArgs += "-v"
-    $DockerArgs += "//var/run/docker.sock:/var/run/docker.sock:rw"
+    $DockerArgs += "//var/run/docker.sock://var/run/docker.sock:rw"
     $DockerArgs += "-e"
     $DockerArgs += "PI_DOCKER_MODE=true"
 }

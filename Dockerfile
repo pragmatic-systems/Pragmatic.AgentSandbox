@@ -1,13 +1,23 @@
 # -----------------------------------------------------------
 # Pi Coding Agent — sandboxed harness
 # -----------------------------------------------------------
-# .NET SDK 10.0 base + .NET 8.0 & 9.0 + Node.js 22 + Docker + Pi
+# .NET SDK 10.0 base + .NET 8.0 & 9.0 + Node.js 22 + Pi
+#
+#   INSTALL_DOCKER=false (default)  Locked-down: no Docker CLI, no extra capabilities
+#                                   docker build -t pi-agent-sandbox-host .
+#
+#   INSTALL_DOCKER=true             Docker mode: Docker CLI + docker group
+#                                   (host socket is mounted by the launcher scripts)
+#                                   docker build --build-arg INSTALL_DOCKER=true -t pi-agent-sandbox-host-dind .
 # -----------------------------------------------------------
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 
-# Install system packages
-RUN apk add --no-cache nodejs npm docker bash curl grep
+ARG INSTALL_DOCKER=false
+
+# Install system packages (Docker CLI only in Docker mode)
+RUN apk add --no-cache nodejs npm bash curl grep && \
+    if [ "$INSTALL_DOCKER" = "true" ]; then apk add --no-cache docker; fi
 
 # Install .NET 8.0 SDK
 RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && \
@@ -22,9 +32,9 @@ RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh &&
 # Install Pi
 RUN npm install -g @earendil-works/pi-coding-agent@0.85.1
 
-# --- Non-root user ---
+# --- Non-root user (docker group only in Docker mode) ---
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
-    addgroup appuser docker
+    if [ "$INSTALL_DOCKER" = "true" ]; then addgroup appuser docker; fi
 
 # --- Directories ---
 RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /home/appuser/.npm /home/appuser/.nuget /opt/pi-agent && \

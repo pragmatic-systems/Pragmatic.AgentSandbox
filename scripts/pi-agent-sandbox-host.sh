@@ -20,14 +20,14 @@ for arg in "$@"; do
   esac
 done
 
-# Select Dockerfile and image tag
+# Select mode and image tag (single Dockerfile, INSTALL_DOCKER build arg)
 if [ "$ENABLE_DOCKER" = true ]; then
-  DOCKERFILE="Dockerfile"
   IMAGE_NAME="pi-agent-sandbox-host-dind"
+  INSTALL_DOCKER=true
   echo "[pi-agent] Docker-in-Docker enabled (host socket)"
 else
-  DOCKERFILE="Dockerfile.locked"
   IMAGE_NAME="pi-agent-sandbox-host"
+  INSTALL_DOCKER=false
   echo "[pi-agent] Locked-down mode (no Docker)"
 fi
 
@@ -36,7 +36,7 @@ fi
 export MSYS_NO_PATHCONV=1
 
 # Build image (no-op if already built)
-docker build -f "$REPO_ROOT/$DOCKERFILE" -t "$IMAGE_NAME" "$REPO_ROOT"
+docker build -f "$REPO_ROOT/Dockerfile" --build-arg INSTALL_DOCKER="$INSTALL_DOCKER" -t "$IMAGE_NAME" "$REPO_ROOT"
 
 # Run Pi
 LAUNCH_DIR="$(basename "$(pwd)")"

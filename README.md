@@ -1,4 +1,4 @@
-# Pi Agent Sandbox Harness
+# Pi Agent Harness Sandbox
 
 A secure Docker container running the [Pi Coding Agent](https://pi.dev/) in a sandbox, with controlled filesystem access and LM Studio integration.
 

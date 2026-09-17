@@ -4,7 +4,7 @@
 # The pi_agent volume is mounted over /home/appuser/.pi/agent, which shadows
 # anything COPY'd there during the build. This entrypoint copies the baked-in
 # files (stored under /opt/pi-agent/) into the live directory only if they
-# don't already exist — so user changes are preserved across runs.
+# don't already exist â€” so user changes are preserved across runs.
 
 set -eu
 

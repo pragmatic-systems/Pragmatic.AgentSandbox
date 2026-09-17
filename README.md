@@ -116,6 +116,7 @@ Only use `--docker` when you need Docker support and accept that the agent has f
 
 - **LM Studio API URL** is set via the `LMSTUDIO_API_URL` environment variable
 - **Custom models/providers** are configured in `models.json` (baked into the image and synced into the `pi_agent` volume on every run when it has changed)
+- **Global instructions** are configured in `AGENTS.md` (baked into the image and synced into `~/.pi/agent/AGENTS.md` on every run, so Pi loads it as its global context file)
 - **Pi cache** is persisted in a Docker volume (`pi_cache`)
 - **Pi agent data** (sessions, settings, auth) is persisted in a Docker volume (`pi_agent`) so sessions survive restarts
 - **npm cache** is persisted in a Docker volume (`npm_cache`)
@@ -142,6 +143,17 @@ Pass via `-e` in the host scripts or override directly in `docker run`.
 
 ```bash
 # After editing models.json in the repo:
+pi-agent-sandbox-host
+```
+
+### Updating `AGENTS.md` (global instructions)
+
+Pi loads `~/.pi/agent/AGENTS.md` as **global instructions**, in addition to any per-project `AGENTS.md`/`CLAUDE.md` in the workspace. To apply instructions to every project without embedding a copy in each one, edit `AGENTS.md` in the repo — it is baked into the image and seeded into `~/.pi/agent/AGENTS.md` by the entrypoint on every run when it differs.
+
+> **Note:** Like `models.json`, `AGENTS.md` is repo-owned: edits made to it *inside the container* are overwritten on the next run. Project-specific rules should still live in a project-level `AGENTS.md`, which layers on top of the global file.
+
+```bash
+# After editing AGENTS.md in the repo:
 pi-agent-sandbox-host
 ```
 

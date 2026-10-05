@@ -1,7 +1,7 @@
 # -----------------------------------------------------------
 # Pi Coding Agent — sandboxed harness
 # -----------------------------------------------------------
-# .NET SDK 10.0 base + .NET 8.0 & 9.0 + Node.js 22 + Python 3 + Ruby (ruby-full + bundler + build tools) + Pi
+# .NET SDK 10.0 base + .NET 8.0 & 9.0 + Node.js 22 + Python 3 (pip) + Ruby (ruby-full + bundler + build tools) + Pi
 #
 #   INSTALL_DOCKER=false (default)  Locked-down: no Docker CLI, no extra capabilities
 #                                   docker build -t pi-agent-sandbox-host .
@@ -16,7 +16,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 ARG INSTALL_DOCKER=false
 
 # Install system packages (Docker CLI only in Docker mode)
-RUN apk add --no-cache nodejs npm bash curl grep python3 ruby-full build-base && \
+RUN apk add --no-cache nodejs npm bash curl grep python3 py3-pip ruby-full build-base && \
     if [ "$INSTALL_DOCKER" = "true" ]; then apk add --no-cache docker; fi
 
 # Install Bundler

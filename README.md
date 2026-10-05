@@ -56,6 +56,8 @@ The container ships with:
 |---|---|
 | .NET SDK | 10.0.100, 9.0, 8.0 |
 | Node.js | 22 (Alpine) |
+| Python 3 | Alpine (python3) |
+| Ruby | Alpine (ruby-full + bundler + build-base) |
 | Docker CLI | Alpine edge (Docker mode only) |
 
 The container has **outbound internet access** by default, so Pi can install tools (e.g. `dotnet tool install`, `npm install`) and restore packages (`dotnet restore`, `npm ci`) at runtime.

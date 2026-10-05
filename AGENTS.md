@@ -1,10 +1,6 @@
 # Container Environment Instructions
 
-<!--
-  This file is baked into the image and seeded into ~/.pi/agent/AGENTS.md on
-  every container start (repo-owned: edits inside the container are
-  overwritten on the next run — edit this file in the repo instead).
--->
+<!-- This file is baked into the image and seeded into ~/.pi/agent/AGENTS.md on every container start. -->
 
 ## Environment
 
@@ -25,3 +21,12 @@ If `NUGET_PACKAGES` is set, the cache lives there instead of `~/.nuget/packages`
 
 If git fails with `fatal: detected dubious ownership`, it's the 9p mount showing files as `root:root` while the agent runs as a different uid — run `git config --global --add safe.directory /home/appuser/mount/<project>` (idempotent; needed again after a container rebuild). 
 Never happens on the Windows host.
+
+## Operating instructions
+
+Do not attempt to work around the constraints of the container. If you are limited by tools or permissions beyond the ones described above, list the issues and return control to the user.
+
+# Output style
+
+- Be concise. Give short, direct answers; skip preamble, apologies, and restating the question.
+- Act first, summarize briefly after. Do not narrate plans or reasoning in the final answer.

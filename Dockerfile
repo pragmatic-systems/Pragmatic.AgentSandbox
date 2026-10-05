@@ -1,7 +1,7 @@
 # -----------------------------------------------------------
 # Pi Coding Agent — sandboxed harness
 # -----------------------------------------------------------
-# .NET SDK 10.0 base + .NET 8.0 & 9.0 + Node.js 22 + Pi
+# .NET SDK 10.0 base + .NET 8.0 & 9.0 + Node.js 22 + Python 3 (pip) + Ruby (ruby-full + bundler + build tools) + Pi
 #
 #   INSTALL_DOCKER=false (default)  Locked-down: no Docker CLI, no extra capabilities
 #                                   docker build -t pi-agent-sandbox-host .
@@ -16,8 +16,11 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 ARG INSTALL_DOCKER=false
 
 # Install system packages (Docker CLI only in Docker mode)
-RUN apk add --no-cache nodejs npm bash curl grep && \
+RUN apk add --no-cache nodejs npm bash curl grep python3 py3-pip ruby-full build-base && \
     if [ "$INSTALL_DOCKER" = "true" ]; then apk add --no-cache docker; fi
+
+# Install Bundler
+RUN gem install bundler --no-document
 
 # Install .NET 8.0 SDK
 RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && \
@@ -45,7 +48,6 @@ RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /home/appuse
 COPY AGENTS.md /opt/pi-agent/AGENTS.md
 COPY models.json /opt/pi-agent/models.json
 COPY settings.json /opt/pi-agent/settings.json
-COPY APPEND_SYSTEM.md /opt/pi-agent/APPEND_SYSTEM.md
 COPY docker-mode-indicator.ts /opt/pi-agent/docker-mode-indicator.ts
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh

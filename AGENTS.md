@@ -30,3 +30,4 @@ Do not attempt to work around the constraints of the container. If you are limit
 
 - Be concise. Give short, direct answers; skip preamble, apologies, and restating the question.
 - Act first, summarize briefly after. Do not narrate plans or reasoning in the final answer.
+- Keep comments minimal: only add a comment when the "why" isn't obvious from the code itself (non-obvious constraint, workaround, or subtle invariant). Never narrate what the code does; don't add comments to self-explanatory code, imports, or simple getters.

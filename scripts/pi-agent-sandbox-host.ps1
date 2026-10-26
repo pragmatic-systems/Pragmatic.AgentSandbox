@@ -2,8 +2,9 @@
 # Run from any directory; mounts CWD as Pi's workspace.
 #
 # Usage:
-#   pi-agent-sandbox-host             # locked-down (no Docker)
-#   pi-agent-sandbox-host --docker    # with Docker-in-Docker support (host socket)
+#   pi-agent-sandbox-host.ps1             # locked-down (no Docker)
+#   pi-agent-sandbox-host.ps1 --docker    # with Docker-in-Docker support (host socket)
+#   pi-agent-sandbox-host.ps1 --rebuild   # force a fresh image build (--no-cache)
 
 # Script runs from /scripts folder inside the Pragmatic.AgentSandbox repo.
 # Dockerfile/compose in parent directory.
@@ -11,8 +12,12 @@ $RepoRoot = (Resolve-Path (Split-Path -Parent $PSScriptRoot)).Path
 
 # Parse arguments
 $EnableDocker = $false
+$ForceRebuild = $false
 if ($args -contains "--docker") {
     $EnableDocker = $true
+}
+if ($args -contains "--rebuild") {
+    $ForceRebuild = $true
 }
 
 # Select mode and image name (single Dockerfile, INSTALL_DOCKER build arg)
@@ -26,8 +31,12 @@ if ($EnableDocker) {
     Write-Host "[pi-agent] Locked-down mode (no Docker)"
 }
 
-# Build image (no-op if already built)
-docker build -f "$RepoRoot/Dockerfile" --build-arg "INSTALL_DOCKER=$InstallDocker" -t $ImageName "$RepoRoot"
+# Rebuild only when --rebuild was passed or the image doesn't exist yet.
+$ImageExists = docker image inspect --format '{{.Created}}' $ImageName 2>$null
+if (-not $ImageExists -or $ForceRebuild) {
+    Write-Host "[pi-agent] Building image"
+    docker build --no-cache -f "$RepoRoot/Dockerfile" --build-arg "INSTALL_DOCKER=$InstallDocker" -t $ImageName "$RepoRoot"
+}
 
 # Run Pi
 $LaunchDir = Split-Path $PWD -Leaf

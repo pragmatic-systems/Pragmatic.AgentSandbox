@@ -4,25 +4,20 @@ A secure Docker container running the [Pi Coding Agent](https://pi.dev/) in a sa
 
 ## Setup
 
-Add the `scripts/` folder to your `%PATH%` (Windows) or `$PATH` (Linux/macOS):
+Add the `scripts/` folder to your `%PATH%` (Windows):
 
 ### Windows (PowerShell)
 ```powershell
 [Environment]::SetEnvironmentVariable("Path", "$env:Path;C:\path\to\Pragmatic.AgentSandbox\scripts", "User")
 ```
 
-### Linux / macOS
-```bash
-export PATH="$PATH:/path/to/Pragmatic.AgentSandbox/scripts"
-```
-
 ## Quick Start
 
-Run `pi-agent-sandbox-host` from any directory — it mounts your current working directory as Pi's workspace:
+Run `pi-agent-sandbox-host.ps1` from any directory — it mounts your current working directory as Pi's workspace:
 
-```bash
+```pwsh
 cd /path/to/your/project
-pi-agent-sandbox-host
+pi-agent-sandbox-host.ps1
 ```
 
 When you exit Pi (Ctrl+C), the container is automatically cleaned up.
@@ -31,8 +26,8 @@ When you exit Pi (Ctrl+C), the container is automatically cleaned up.
 
 | Mode | Command | Docker CLI | Host Socket | Security Hardening |
 |---|---|---|---|---|
-| **Locked-down** (default) | `pi-agent-sandbox-host` | ❌ | ❌ | `--cap-drop=ALL`, `no-new-privileges` |
-| **Docker** (opt-in) | `pi-agent-sandbox-host --docker` | ✅ | ✅ | None (see Security) |
+| **Locked-down** (default) | `pi-agent-sandbox-host.ps1` | ❌ | ❌ | `--cap-drop=ALL`, `no-new-privileges` |
+| **Docker** (opt-in) | `pi-agent-sandbox-host.ps1 --docker` | ✅ | ✅ | None (see Security) |
 
 > **Tip:** The current mode is shown in the Pi footer status bar:
 > - `🐳 Secure Sandbox (✅) locked down (✅)` — locked-down mode (default)
@@ -40,7 +35,15 @@ When you exit Pi (Ctrl+C), the container is automatically cleaned up.
 
 ```bash
 # With Docker support (opt-in, host socket mount)
-pi-agent-sandbox-host --docker
+pi-agent-sandbox-host.ps1 --docker
+```
+
+### Image build behaviour
+
+The image is only built on demand, any existing image is reused. `--rebuild` forces a full fresh build with `--no-cache`, and re-resolves the `latest` package versions.
+
+```bash
+pi-agent-sandbox-host.ps1 --rebuild
 ```
 
 ## Prerequisites
@@ -54,7 +57,7 @@ The container ships with:
 
 | Tool | Version |
 |---|---|
-| .NET SDK | 10.0.100, 9.0, 8.0 |
+| .NET SDK | 10.0 (latest), 9.0, 8.0 |
 | Node.js | 22 (Alpine) |
 | Python 3 | Alpine (python3 + pip) |
 | Ruby | Alpine (ruby-full + bundler + build-base) |
@@ -138,24 +141,24 @@ Pass via `-e` in the host scripts or override directly in `docker run`.
 
 ### Updating `models.json`
 
-`models.json` is baked into the image at build time, then synced into the `pi_agent` volume by the entrypoint if it differs from the live copy. edit `models.json` in the repo and simply re-run the host script: it rebuilds the image and seeds the new config automatically.
+`models.json` is baked into the image at build time, then synced into the `pi_agent` volume by the entrypoint if it differs from the live copy. edit `models.json` in the repo, then run the host script with `--rebuild`: it rebuilds the image and seeds the new config automatically.
 
 > **Note:** `models.json` is repo-owned, so edits made to it *inside the container* are overwritten on the next run. Customize it via the repo file instead. Other agent data (sessions, auth, `settings.json`) is preserved and never overwritten.
 
 ```bash
 # After editing models.json in the repo:
-pi-agent-sandbox-host
+pi-agent-sandbox-host.ps1 --rebuild
 ```
 
 ### Updating `AGENTS.md` (global instructions)
 
-Pi loads `~/.pi/agent/AGENTS.md` as **global instructions**, in addition to any per-project `AGENTS.md`/`CLAUDE.md` in the workspace. To apply instructions to every project without embedding a copy in each one, edit `AGENTS.md` in the repo — it is baked into the image and seeded into `~/.pi/agent/AGENTS.md` by the entrypoint on every run when it differs.
+Pi loads `~/.pi/agent/AGENTS.md` as **global instructions**, in addition to any per-project `AGENTS.md`/`CLAUDE.md` in the workspace. To apply instructions to every project without embedding a copy in each one, edit `AGENTS.md` in the repo and re-run the host script with `--rebuild` to bake the change into the image; the entrypoint seeds it into `~/.pi/agent/AGENTS.md` on the next run when it differs.
 
 > **Note:** Like `models.json`, `AGENTS.md` is repo-owned: edits made to it *inside the container* are overwritten on the next run. Project-specific rules should still live in a project-level `AGENTS.md`, which layers on top of the global file.
 
 ```bash
 # After editing AGENTS.md in the repo:
-pi-agent-sandbox-host
+pi-agent-sandbox-host.ps1 --rebuild
 ```
 
 ## Docker Support
@@ -163,7 +166,7 @@ pi-agent-sandbox-host
 By default, the container runs in **locked-down mode** — no Docker CLI is installed, no socket is mounted, and all Linux capabilities are dropped. To enable Docker support, pass `--docker`:
 
 ```bash
-pi-agent-sandbox-host --docker
+pi-agent-sandbox-host.ps1 --docker
 ```
 
 This mounts the host Docker socket, allowing Pi to run Docker commands (`docker build`, `docker run`, `docker compose`) against the host Docker daemon.

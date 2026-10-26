@@ -11,6 +11,7 @@
 #                                   docker build --build-arg INSTALL_DOCKER=true -t pi-agent-sandbox-host-dind .
 # -----------------------------------------------------------
 
+# Always use latest alpine and tooling on build. Rebuilds driven by --rebuild flag in script.
 FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 
 ARG INSTALL_DOCKER=false

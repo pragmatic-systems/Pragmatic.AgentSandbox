@@ -6,7 +6,7 @@
 #   INSTALL_DOCKER=false (default)  Locked-down: no Docker CLI, no extra capabilities
 #                                   docker build -t pi-agent-sandbox-host .
 #
-#   INSTALL_DOCKER=true             Docker mode: Docker CLI + docker group
+#   INSTALL_DOCKER=true             Docker mode: Docker CLI + compose plugin + docker group
 #                                   (host socket is mounted by the launcher scripts)
 #                                   docker build --build-arg INSTALL_DOCKER=true -t pi-agent-sandbox-host-dind .
 # -----------------------------------------------------------
@@ -16,9 +16,10 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
 
 ARG INSTALL_DOCKER=false
 
-# Install system packages (Docker CLI only in Docker mode)
+# Install system packages (Docker CLI + compose plugin only in Docker mode)
+# docker-cli-compose provides `docker compose` (the docker metapackage lacks it)
 RUN apk add --no-cache nodejs npm bash curl grep python3 py3-pip ruby-full build-base && \
-    if [ "$INSTALL_DOCKER" = "true" ]; then apk add --no-cache docker; fi
+    if [ "$INSTALL_DOCKER" = "true" ]; then apk add --no-cache docker docker-cli-compose; fi
 
 # Install Bundler
 RUN gem install bundler --no-document

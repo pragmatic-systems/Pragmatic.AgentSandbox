@@ -2,8 +2,9 @@
 # Run from any directory; mounts CWD as Pi's workspace.
 #
 # Usage:
-#   pi-agent-sandbox-host             # locked-down (no Docker)
-#   pi-agent-sandbox-host --docker    # with Docker-in-Docker support (host socket)
+#   pi-agent-sandbox-host.ps1             # locked-down (no Docker)
+#   pi-agent-sandbox-host.ps1 --docker    # with Docker-in-Docker support (host socket)
+#   pi-agent-sandbox-host.ps1 --rebuild   # force a fresh image build (--no-cache)
 
 # Script runs from /scripts folder inside the Pragmatic.AgentSandbox repo.
 # Dockerfile/compose in parent directory.
@@ -33,8 +34,8 @@ if ($EnableDocker) {
 # Rebuild only when --rebuild was passed or the image doesn't exist yet.
 $ImageExists = docker image inspect --format '{{.Created}}' $ImageName 2>$null
 if (-not $ImageExists -or $ForceRebuild) {
-        Write-Host "[pi-agent]: Building Image"
-        docker build --no-cache -f "$RepoRoot/Dockerfile" --build-arg "INSTALL_DOCKER=$InstallDocker" -t $ImageName "$RepoRoot"
+    Write-Host "[pi-agent] Building image"
+    docker build --no-cache -f "$RepoRoot/Dockerfile" --build-arg "INSTALL_DOCKER=$InstallDocker" -t $ImageName "$RepoRoot"
 }
 
 # Run Pi

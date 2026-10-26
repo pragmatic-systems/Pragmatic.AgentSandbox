@@ -57,7 +57,7 @@ The container ships with:
 
 | Tool | Version |
 |---|---|
-| .NET SDK | 10.0.403, 9.0, 8.0 |
+| .NET SDK | 10.0 (latest), 9.0, 8.0 |
 | Node.js | 22 (Alpine) |
 | Python 3 | Alpine (python3 + pip) |
 | Ruby | Alpine (ruby-full + bundler + build-base) |

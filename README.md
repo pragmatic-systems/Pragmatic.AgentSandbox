@@ -4,25 +4,21 @@ A secure Docker container running the [Pi Coding Agent](https://pi.dev/) in a sa
 
 ## Setup
 
-Add the `scripts/` folder to your `%PATH%` (Windows) or `$PATH` (Linux/macOS):
+Add the `scripts/` folder to your `%PATH%` (Windows):
 
 ### Windows (PowerShell)
 ```powershell
 [Environment]::SetEnvironmentVariable("Path", "$env:Path;C:\path\to\Pragmatic.AgentSandbox\scripts", "User")
 ```
 
-### Linux / macOS
-```bash
-export PATH="$PATH:/path/to/Pragmatic.AgentSandbox/scripts"
-```
 
 ## Quick Start
 
-Run `pi-agent-sandbox-host` from any directory — it mounts your current working directory as Pi's workspace:
+Run `pi-agent-sandbox-host.ps1` from any directory — it mounts your current working directory as Pi's workspace:
 
-```bash
+```pwsh
 cd /path/to/your/project
-pi-agent-sandbox-host
+pi-agent-sandbox-host.ps1
 ```
 
 When you exit Pi (Ctrl+C), the container is automatically cleaned up.
@@ -41,6 +37,14 @@ When you exit Pi (Ctrl+C), the container is automatically cleaned up.
 ```bash
 # With Docker support (opt-in, host socket mount)
 pi-agent-sandbox-host --docker
+```
+
+### Image build behaviour
+
+The image is only built on demand, any existing image is reused. `--rebuild` forces a full fresh build with `--no-cache`, and re-resolves the `latest` package versions.
+
+```bash
+pi-agent-sandbox-host --rebuild
 ```
 
 ## Prerequisites

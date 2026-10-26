@@ -11,10 +11,11 @@
 #                                   docker build --build-arg INSTALL_DOCKER=true -t pi-agent-sandbox-host-dind .
 # -----------------------------------------------------------
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0-alpine
+FROM mcr.microsoft.com/dotnet/sdk:10.0.403-alpine3.24
 
 ARG INSTALL_DOCKER=false
 
+# NOTE: Always installs latest tooling on build - this can drift over time.
 # Install system packages (Docker CLI only in Docker mode)
 RUN apk add --no-cache nodejs npm bash curl grep python3 py3-pip ruby-full build-base && \
     if [ "$INSTALL_DOCKER" = "true" ]; then apk add --no-cache docker; fi

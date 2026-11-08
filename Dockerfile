@@ -35,7 +35,7 @@ RUN curl -fsSL https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh &&
     rm /tmp/dotnet-install.sh
 
 # Install Pi
-RUN npm install -g @earendil-works/pi-coding-agent@0.85.1
+RUN npm install -g @earendil-works/pi-coding-agent@1.5.0
 
 # --- Non-root user (docker group only in Docker mode) ---
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \

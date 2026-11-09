@@ -8,13 +8,18 @@
 - The workspace at `/home/appuser/mount/<project>` is a bind mount of a host directory — files you write here land on the host filesystem.
 - Outbound internet access is available for package restore and tool install.
 - LM Studio is reachable at `http://host.docker.internal:1234/v1`.
-- Package caches (~/.npm, ~/.nuget) are pruned on startup based on access age.
+- Package caches (~/.npm, ~/.nuget) are pruned on startup by access age. The NuGet prune is folder-granular and self-repairs partial package folders (see below).
 
-## NuGet cache corruption (recurring)
+## NuGet cache corruption
 
-This issue is a side effect of a shared shared Windows host + Linux container workspace.
-Restore/build errors like `NU1102`/`NU1103`/`NU1403`, `NU1006`, "not a valid NuGet package", or SHA512 hash mismatches usually mean a corrupted global packages folder.
-Don't patch around it: Wait for IDE/NCrunch file locks to release, then run `dotnet nuget locals global-packages --clear`, `dotnet nuget locals temp --clear`, `dotnet nuget locals http-cache --clear`, and rebuild with `dotnet cake --Target=BuildAndTest`. 
+Two distinct causes — match the symptom before acting:
+
+| Symptom | Cause | Action |
+|---|---|---|
+| `NU5037`, missing files, version folders holding only `.nupkg`+`.sha512` (no `.nuspec`) | A stale/partial global-packages folder. Historically produced by the old per-file entrypoint prune — now fixed (the prune is folder-granular and self-repairs partial folders on start). | Clear once, then rebuild (below). |
+| SHA512 mismatch, `NU1403`/`NU1006`, "not a valid NuGet package" | Windows-host file locks (IDE/NCrunch) writing through the 9p workspace. | Wait for the locks to release, then clear + rebuild. |
+
+Recovery for either (don't patch around it): run `dotnet nuget locals global-packages --clear`, `dotnet nuget locals temp --clear`, `dotnet nuget locals http-cache --clear`, then rebuild with `dotnet cake --Target=BuildAndTest`.
 If `NUGET_PACKAGES` is set, the cache lives there instead of `~/.nuget/packages`.
 
 ## Git in the Linux container

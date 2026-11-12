@@ -26,7 +26,7 @@ mkdir -p "$AGENT_DIR/extensions"
 # Copy only if the destination doesn't exist (for user/Pi-owned files).
 seed_if_missing() {
   local src="$1" dest="$2"
-  if [ -e "$src" ] && [ ! -e "$dest" ]; then
+  if [[ -e "$src" ]] && [[ ! -e "$dest" ]]; then
     cp "$src" "$dest"
   fi
 }
@@ -34,7 +34,7 @@ seed_if_missing() {
 # Copy if the destination is missing or its content differs (for repo-owned files).
 seed_if_changed() {
   local src="$1" dest="$2"
-  if [ -e "$src" ] && { [ ! -e "$dest" ] || ! cmp -s "$src" "$dest"; }; then
+  if [[ -e "$src" ]] && { [[ ! -e "$dest" ]] || ! cmp -s "$src" "$dest"; }; then
     cp "$src" "$dest"
   fi
 }
@@ -57,17 +57,17 @@ NUGET_CACHE_MAX_AGE_DAYS="${NUGET_CACHE_MAX_AGE_DAYS:-30}"
 NPM_CACHE_MAX_AGE_DAYS="${NPM_CACHE_MAX_AGE_DAYS:-30}"
 
 # If we have nuget packages
-if [ -d "$HOME/.nuget/packages" ]; then
+if [[ -d "$HOME/.nuget/packages" ]]; then
 
   # Packages pruned count
   pruned=0
 
   # Iterate package version folders: packages/<id>/<version>
   while IFS= read -r dir; do
-    [ -d "$dir" ] || continue
+    [[ -d "$dir" ]] || continue
 
     # Remove the folder if no file in it was accessed within N days. Any recently-used file keeps the package whole.
-    if [ -z "$(find "$dir" -type f -atime -"$NUGET_CACHE_MAX_AGE_DAYS" 2>/dev/null)" ]; then
+    if [[ -z "$(find "$dir" -type f -atime -"$NUGET_CACHE_MAX_AGE_DAYS" 2>/dev/null)" ]]; then
       rm -rf -- "$dir"
       pruned=$((pruned + 1))
     fi
@@ -76,7 +76,7 @@ if [ -d "$HOME/.nuget/packages" ]; then
   done < <(find "$HOME/.nuget/packages" -mindepth 2 -maxdepth 2 -type d 2>/dev/null)
 
   # Print prune count if > 0
-  if [ "$pruned" -gt 0 ]; then
+  if [[ "$pruned" -gt 0 ]]; then
     echo "[cache] Pruned $pruned stale NuGet package folder(s) (unused ${NUGET_CACHE_MAX_AGE_DAYS}+ days)"
   fi
 
@@ -85,13 +85,13 @@ if [ -d "$HOME/.nuget/packages" ]; then
 fi
 
 # If we have an npm cache
-if [ -d "$HOME/.npm/_cacache" ]; then
+if [[ -d "$HOME/.npm/_cacache" ]]; then
 
   # Count the files not accessed in N days
   count=$(find "$HOME/.npm/_cacache" -type f -atime +"$NPM_CACHE_MAX_AGE_DAYS" | wc -l)
   
   # If we find any, print count and delete npm cache
-  if [ "$count" -gt 0 ]; then
+  if [[ "$count" -gt 0 ]]; then
     echo "[cache] Pruning $count npm cache files unused for ${NPM_CACHE_MAX_AGE_DAYS} days"
     find "$HOME/.npm/_cacache" -type f -atime +"$NPM_CACHE_MAX_AGE_DAYS" -delete
   fi

@@ -8,7 +8,7 @@
 - The workspace at `/home/appuser/mount/<project>` is a bind mount of a host directory — files you write here land on the host filesystem.
 - Outbound internet access is available for package restore and tool install.
 - LM Studio is reachable at `http://host.docker.internal:1234/v1`.
-- Package caches (~/.npm, ~/.nuget) are pruned on startup by access age. The NuGet prune is folder-granular and self-repairs partial package folders (see below).
+- Package caches (~/.npm, ~/.nuget) are pruned on startup by access age. The NuGet prune is folder-granular — a version folder is kept whole or removed whole — so it never leaves a partial folder behind (see below).
 
 ## NuGet cache corruption
 
@@ -16,7 +16,7 @@ Two distinct causes — match the symptom before acting:
 
 | Symptom | Cause | Action |
 |---|---|---|
-| `NU5037`, missing files, version folders holding only `.nupkg`+`.sha512` (no `.nuspec`) | A stale/partial global-packages folder. Historically produced by the old per-file entrypoint prune — now fixed (the prune is folder-granular and self-repairs partial folders on start). | Clear once, then rebuild (below). |
+| `NU5037`, missing files, version folders holding only `.nupkg`+`.sha512` (no `.nuspec`) | A stale/partial global-packages folder. Historically produced by the old per-file entrypoint prune — now fixed (the prune is folder-granular and cannot create partial folders; the existing corruption was repaired manually). | Clear once, then rebuild (below). |
 | SHA512 mismatch, `NU1403`/`NU1006`, "not a valid NuGet package" | Windows-host file locks (IDE/NCrunch) writing through the 9p workspace. | Wait for the locks to release, then clear + rebuild. |
 
 Recovery for either (don't patch around it): run `dotnet nuget locals global-packages --clear`, `dotnet nuget locals temp --clear`, `dotnet nuget locals http-cache --clear`, then rebuild with `dotnet cake --Target=BuildAndTest`.

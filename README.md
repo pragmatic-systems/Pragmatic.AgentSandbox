@@ -1,3 +1,7 @@
+<p>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License"></a>
+</p>
+
 # Pi Agent Harness Sandbox
 
 A secure Docker container running the [Pi Coding Agent](https://pi.dev/) in a sandbox, with controlled filesystem access and LM Studio integration.
@@ -172,3 +176,7 @@ pi-agent-sandbox-host.ps1 --docker
 This mounts the host Docker socket, allowing Pi to run Docker commands (`docker build`, `docker run`, `docker compose`) against the host Docker daemon.
 
 > **Security note:** Mounting the Docker socket grants the container full control of the host Docker environment. The `--cap-drop=ALL` and `--security-opt=no-new-privileges` restrictions are disabled in this mode. Only use `--docker` when Docker support is actually needed.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

@@ -5,6 +5,9 @@
 #   pi-agent-sandbox-host.ps1             # locked-down (no Docker)
 #   pi-agent-sandbox-host.ps1 --docker    # with Docker-in-Docker support (host socket)
 #   pi-agent-sandbox-host.ps1 --rebuild   # force a fresh image build (--no-cache)
+#
+# GitHub PAT for the github MCP server:
+#   pi-agent-sandbox-host.ps1 --gh-mcp-token <PAT>
 
 # Script runs from /scripts folder inside the Pragmatic.AgentSandbox repo.
 # Dockerfile/compose in parent directory.
@@ -13,11 +16,21 @@ $RepoRoot = (Resolve-Path (Split-Path -Parent $PSScriptRoot)).Path
 # Parse arguments
 $EnableDocker = $false
 $ForceRebuild = $false
+$GithubToken = $null
 if ($args -contains "--docker") {
     $EnableDocker = $true
 }
 if ($args -contains "--rebuild") {
     $ForceRebuild = $true
+}
+for ($i = 0; $i -lt $args.Count; $i++) {
+    switch ($args[$i]) {
+        "--gh-mcp-token" {
+            if ($i + 1 -ge $args.Count) { Write-Error "--gh-mcp-token requires a value"; exit 1 }
+            $GithubToken = $args[$i + 1]
+            $i++
+        }
+    }
 }
 
 # Select mode and image name (single Dockerfile, INSTALL_DOCKER build arg)
@@ -69,6 +82,15 @@ if (-not $EnableDocker) {
     $DockerArgs += "//var/run/docker.sock://var/run/docker.sock:rw"
     $DockerArgs += "-e"
     $DockerArgs += "PI_DOCKER_MODE=true"
+}
+
+if ($GithubToken) {
+    # GitHub PAT for the github MCP server (mcp.json references ${GITHUB_TOKEN}).
+    $DockerArgs += "-e"
+    $DockerArgs += "GITHUB_TOKEN=$GithubToken"
+    Write-Host "[pi-agent] GitHub PAT supplied - github MCP server enabled"
+} else {
+    Write-Host "[pi-agent] No GitHub PAT (--gh-mcp-token) - github MCP server will be inactive"
 }
 
 $DockerArgs += $ImageName

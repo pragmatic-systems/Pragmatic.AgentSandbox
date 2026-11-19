@@ -124,6 +124,7 @@ Only use `--docker` when you need Docker support and accept that the agent has f
 ## Configuration
 
 - **LM Studio API URL and custom models/providers** are configured in `models.json` (baked into the image and synced into the `pi_agent` volume on every run when it has changed)
+- **MCP servers** are configured in `mcp.json` (baked into the image and synced into the `pi_agent` volume on every run when it has changed) — the `github` servers sign in via OAuth: run `pi mcp login todo` / `pi mcp login github` (or `/mcp login <server>`) and complete the browser flow
 - **Global instructions** are configured in `AGENTS.md` (baked into the image and synced into `~/.pi/agent/AGENTS.md` on every run, so Pi loads it as its global context file)
 - **Pi cache** is persisted in a Docker volume (`pi_cache`)
 - **Pi agent data** (sessions, settings, auth) is persisted in a Docker volume (`pi_agent`) so sessions survive restarts

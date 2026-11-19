@@ -49,6 +49,7 @@ RUN mkdir -p /home/appuser/mount /home/appuser/.pi/agent/extensions /home/appuse
 # Stored outside .pi/agent so the pi_agent volume mount doesn't shadow them
 COPY AGENTS.md /opt/pi-agent/AGENTS.md
 COPY models.json /opt/pi-agent/models.json
+COPY mcp.json /opt/pi-agent/mcp.json
 COPY settings.json /opt/pi-agent/settings.json
 COPY docker-mode-indicator.ts /opt/pi-agent/docker-mode-indicator.ts
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh

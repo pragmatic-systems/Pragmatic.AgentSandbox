@@ -6,7 +6,7 @@
 # files (stored under /opt/pi-agent/) into the live directory, but treats them
 # differently:
 #
-#   - Repo-owned config (AGENTS.md, models.json, docker-mode-indicator.ts)
+#   - Repo-owned config (AGENTS.md, models.json, mcp.json, docker-mode-indicator.ts)
 #     is synced from the image on every run when it differs, so config
 #     updates after a rebuild are always picked up.
 #   - User/Pi-owned files (settings.json) are created only on first run and
@@ -42,6 +42,7 @@ seed_if_changed() {
 # Repo-owned: always sync from the image so rebuilds take effect.
 seed_if_changed "$SEED_DIR/AGENTS.md" "$AGENT_DIR/AGENTS.md"
 seed_if_changed "$SEED_DIR/models.json" "$AGENT_DIR/models.json"
+seed_if_changed "$SEED_DIR/mcp.json" "$AGENT_DIR/mcp.json"
 seed_if_changed "$SEED_DIR/docker-mode-indicator.ts" "$AGENT_DIR/docker-mode-indicator.ts"
 
 # User/Pi-owned: seed on first run only, then leave untouched.
